@@ -66,6 +66,7 @@ let J3 = {
         }
         let appendChildren = (children)=>{
             for(let child of children){
+                if(child === null || child === undefined)continue
                 if(typeof child === 'object' && child !== null && child instanceof Array){
                     appendChildren(child)
                     continue
