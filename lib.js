@@ -5,11 +5,23 @@ export class Component{// 在constructor setAttribute appendChild 时 render
         this.root = document.createElement('div')
         this.children = []
         this.attributes = {}
+        this.state = {}
         this.requestQuest = false
         this.requestRender()
 
     }
+    setState(state){
+        Object.assign(this.state,state)
+        this.requestRender()
+
+    }
     setAttribute(name,value){
+        let matched
+        if(matched = name.match(/^on([\s\S]+)/)){
+            let eventType = matched[1].replace(/[A-Z]/g,c=>c.toLowerCase())
+            console.log(eventType)
+            this.root.addEventListener(eventType,value)
+        }
         this.attributes[name] = value
         this.requestRender()
 
@@ -62,6 +74,9 @@ export function createElement(type,attibutes,...children){
             if(typeof child === 'object' && child !== null && child instanceof Array){
                 appendChildren(child)
                 continue
+            }
+            if(typeof child === 'number'){
+                child = child.toString()
             }
             if(typeof child === 'string'){
                 child = document.createTextNode(child)
