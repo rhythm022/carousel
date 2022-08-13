@@ -36,11 +36,11 @@ class Carousel extends Component {
    
 
             setTimeout(() => {
-                currentEle.style.transition = ''
-                nextEle.style.transition = ''
                 currentEle.style.left = (current + 1) * -100 + '%'
                 nextEle.style.left = next * -100 + '%'
-
+                currentEle.style.transition = ''
+                nextEle.style.transition = ''
+                
                 current = next
             },0)
         }, 2000);
