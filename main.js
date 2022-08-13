@@ -20,27 +20,49 @@ class Carousel extends Component {
 
         let startX =0
         let endX=0
+
+
+
+        const m = (a)=>((a%element.children.length)+element.children.length)%element.children.length
         const mousemove = (e) => {
             console.log(e)
-            const offset = endX + e.clientX - startX;
-            [...element.children].forEach(ele => {
-                ele.style.transform = `translateX(${offset}px)`
-                ele.style.transition = 'none'
-            })
+            let x = endX + e.clientX - startX;// 鼠标
+            x = -x
+
+            let left = Math.floor(x/1142);// 鼠标的左
+            let right = Math.ceil(x/1142);// 鼠标的右
+          
+
+            const offset= x - left * 1142// 小数部分
+            let leftPosition =  m(left)*1142+offset;
+            let rightPosition =  (m(right)-1)*1142+offset;
+
+            element.children[m(left)].style.transform = `translateX(${-leftPosition}px)`
+            element.children[m(right)].style.transform = `translateX(${-rightPosition}px)`
+
+            // element.children[m(left)].style.transition = ''
+            // element.children[m(right)].style.transition = ''
+
+
 
         }
         const mouseup = (e) => {
             console.log(e)
             endX = endX + e.clientX - startX
 
-            const index = Math.round(endX / 1142)
-            const offset = index * 1142;
+            // const index = Math.round(endX / 1142)
+            // const offset = index * 1142;
 
-            [...element.children].forEach(ele => {
-                ele.style.transform = `translateX(${offset}px)`;
-                ele.style.transition = ''
-            })
-            endX = offset
+            // let left = Math.ceil(endX/1142);
+            // let right = Math.floor(endX/1142);
+            // left = m(left)
+            // right = m(right);
+
+            // [...element.children].forEach(ele => {
+            //     ele.style.transform = `translateX(${offset}px)`;
+            //     ele.style.transition = ''
+            // })
+            // endX = offset
             document.removeEventListener('mousemove', mousemove)
             document.removeEventListener('mouseup', mouseup)
         }
