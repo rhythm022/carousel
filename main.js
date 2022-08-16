@@ -27,17 +27,16 @@ class Carousel extends Component {
                 ele.style.zIndex = 0
             })
             // 分为两种情况：图片向左移动、图片向右移动。向左移动的情况简单。
-            let x = endX + e.clientX - startX;// x 为图片移动的累计距离
-            x = -x // 定义图片向左移动是正方向，这样，可以定义 left 和 right
+            let x = -(endX + e.clientX - startX);// x 为图片移动的累计距离// 定义图片向左移动是正方向，这样，可以定义 left 和 right
             let left = Math.floor(x / 1142);
             let right = left + 1;
-            const offset = x - Math.floor(x / 1142) * 1142// x 减去它的地板，offset 一定是正数（即使是当 x 是负数的情况）
+            const offset = x - left * 1142// x 减去它的地板，offset 一定是正数（即使是当 x 是负数的情况）
             left = m(left)
             right = m(right)
-            let leftPosition = - left * 1142 - offset;// + (- offset) 一定左移
-            let rightPosition = (- right + 1) * 1142 - offset;
-            element.children[left].style.transform = `translateX(${leftPosition}px)`
-            element.children[right].style.transform = `translateX(${rightPosition}px)`
+            let leftPosition = left * 1142 + offset;// + (- offset) 一定左移
+            let rightPosition = (right - 1) * 1142 + offset;
+            element.children[left].style.transform = `translateX(${-leftPosition}px)`
+            element.children[right].style.transform = `translateX(${-rightPosition}px)`
             element.children[left].style.zIndex = 2
             element.children[right].style.zIndex = 2
             // element.children[m(left)].style.transition = ''
