@@ -14,32 +14,32 @@ class Carousel extends Component {
         </div>
 
 
-        element.addEventListener('dragstart',(e)=>{
-            e.preventDefault()
-        })
+        element.addEventListener('dragstart', (e) => e.preventDefault())
 
-        let startX =0
-        let endX=0
+        let startX = 0
+        let endX = 0
+        const mod = (b) => (a) => ((a % b) + b) % b
+        const m = mod(element.children.length)
 
-
-
-        const m = (a)=>((a%element.children.length)+element.children.length)%element.children.length
         const mousemove = (e) => {
-            console.log(e)
-            let x = endX + e.clientX - startX;// 鼠标
-            x = -x
-
-            let left = Math.floor(x/1142);// 鼠标的左
-            let right = Math.ceil(x/1142);// 鼠标的右
-          
-
-            const offset= x - left * 1142// 小数部分
-            let leftPosition =  m(left)*1142+offset;
-            let rightPosition =  (m(right)-1)*1142+offset;
-
-            element.children[m(left)].style.transform = `translateX(${-leftPosition}px)`
-            element.children[m(right)].style.transform = `translateX(${-rightPosition}px)`
-
+            // console.log(e)
+            [...element.children].forEach(ele => {
+                ele.style.zIndex = 0
+            })
+            // 分为两种情况：图片向左移动、图片向右移动。向左移动的情况简单。
+            let x = endX + e.clientX - startX;// x 为图片移动的累计距离
+            x = -x // 定义图片向左移动是正方向，这样，可以定义 left 和 right
+            let left = Math.floor(x / 1142);
+            let right = left + 1;
+            const offset = x - Math.floor(x / 1142) * 1142// x 减去它的地板，offset 一定是正数（即使是当 x 是负数的情况）
+            left = m(left)
+            right = m(right)
+            let leftPosition = - left * 1142 - offset;// + (- offset) 一定左移
+            let rightPosition = (- right + 1) * 1142 - offset;
+            element.children[left].style.transform = `translateX(${leftPosition}px)`
+            element.children[right].style.transform = `translateX(${rightPosition}px)`
+            element.children[left].style.zIndex = 2
+            element.children[right].style.zIndex = 2
             // element.children[m(left)].style.transition = ''
             // element.children[m(right)].style.transition = ''
 
@@ -47,7 +47,7 @@ class Carousel extends Component {
 
         }
         const mouseup = (e) => {
-            console.log(e)
+            // console.log(e)
             endX = endX + e.clientX - startX
 
             // const index = Math.round(endX / 1142)
@@ -56,7 +56,7 @@ class Carousel extends Component {
             // let left = Math.ceil(endX/1142);
             // let right = Math.floor(endX/1142);
             // left = m(left)
-            // right = m(right);
+            // right = m(right);// 得到两张图
 
             // [...element.children].forEach(ele => {
             //     ele.style.transform = `translateX(${offset}px)`;
@@ -67,7 +67,7 @@ class Carousel extends Component {
             document.removeEventListener('mouseup', mouseup)
         }
         element.addEventListener('mousedown', (e) => {
-            console.log(e)
+            // console.log(e)
             startX = e.clientX
             document.addEventListener('mousemove', mousemove)
             document.addEventListener('mouseup', mouseup)
