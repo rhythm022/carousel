@@ -21,7 +21,7 @@ class Carousel extends Component {
         let startX = 0
         let endX = 0
         let movingEls = []
-        let upMovingEls = []
+        let manualMovingEls = []
         const mod = (b) => (a) => ((a % b) + b) % b
         const m = mod(element.children.length)
 
@@ -37,13 +37,15 @@ class Carousel extends Component {
                         const tOffset = transform.match(/matrix\(1, 0, 0, 1, ([\s\S]+), 0\)/)[1]
 
                         endX = Number(tOffset)
+                        console.log('进入自动动画状态后 mousedown:',tOffset)
 
                     }
                 })
                 movingEls.length = 0
+                manualMovingEls.length = 0
             } 
-            if (upMovingEls.length) {
-                upMovingEls.forEach((ele, i) => {
+            if (manualMovingEls.length) {
+                manualMovingEls.forEach((ele, i) => {
                     const transform = getComputedStyle(ele).transform
                     ele.style.transition = 'none'
                     ele.style.transform = transform
@@ -51,13 +53,14 @@ class Carousel extends Component {
                         const tOffset = transform.match(/matrix\(1, 0, 0, 1, ([\s\S]+), 0\)/)[1]
 
                         endX = Number(tOffset)
-
+                        console.log('手工:',tOffset)
                     }
                 })
-                upMovingEls.length = 0
+                manualMovingEls.length = 0
             } 
 
 
+            console.log('mousedown')
             startX = e.clientX
 
             document.addEventListener('mousemove', mousemove)
@@ -105,21 +108,21 @@ class Carousel extends Component {
             element.children[right].style.transform = `translateX(${-rightPosition}px)`
             element.children[right].style.transition = ''
 
-            upMovingEls[0] = element.children[left]
-            upMovingEls[1] = element.children[right]
+            manualMovingEls[0] = element.children[left]
+            manualMovingEls[1] = element.children[right]
 
             document.removeEventListener('mousemove', mousemove)
             document.removeEventListener('mouseup', mouseup)
+
+            current = (left + offset) % element.children.length 
+            intervalHandler = setInterval(interval, 3000);
         }
 
 
 
 
 
-        
-
-
-        intervalHandler = setInterval(() => {
+        function interval(){
             let next = (current + 1) % element.children.length
             const currentEle = element.children[current]
             const nextEle = element.children[next];
@@ -149,7 +152,9 @@ class Carousel extends Component {
 
                 current = next
             }, 16)
-        }, 3000);
+        }
+        
+        intervalHandler = setInterval(interval, 3000);
 
 
         return element
