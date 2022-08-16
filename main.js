@@ -21,20 +21,48 @@ class Carousel extends Component {
         let startX = 0
         let endX = 0
         let movingEls = []
+        let upMovingEls = []
         const mod = (b) => (a) => ((a % b) + b) % b
         const m = mod(element.children.length)
 
         element.addEventListener('mousedown', (e) => {
             clearInterval(intervalHandler)
             clearTimeout(timeoutHandler);
-            movingEls.forEach(ele => {
-                ele.style.transition = 'none'
-            })
+            if (movingEls.length) {
+                movingEls.forEach((ele, i) => {
+                    const transform = getComputedStyle(ele).transform
+                    ele.style.transition = 'none'
+                    ele.style.transform = transform
+                    if (i === 0) {
+                        const tOffset = transform.match(/matrix\(1, 0, 0, 1, ([\s\S]+), 0\)/)[1]
+
+                        endX = Number(tOffset)
+
+                    }
+                })
+                movingEls.length = 0
+            } 
+            if (upMovingEls.length) {
+                upMovingEls.forEach((ele, i) => {
+                    const transform = getComputedStyle(ele).transform
+                    ele.style.transition = 'none'
+                    ele.style.transform = transform
+                    if (i === 0) {
+                        const tOffset = transform.match(/matrix\(1, 0, 0, 1, ([\s\S]+), 0\)/)[1]
+
+                        endX = Number(tOffset)
+
+                    }
+                })
+                upMovingEls.length = 0
+            } 
+
 
             startX = e.clientX
 
             document.addEventListener('mousemove', mousemove)
             document.addEventListener('mouseup', mouseup)
+
         })
 
         function mousemove(e) {
@@ -43,38 +71,43 @@ class Carousel extends Component {
             })
 
             let x = -(endX + e.clientX - startX);// x 为图片移动的累计距离// 定义图片向左移动是正方向，这样，可以定义 left 和 right
-            let left = Math.floor(x / 1142);
+            //    console.log(endX, e.clientX , startX)
+            let left = Math.floor(x / 600);
             let right = left + 1;
-            const offset = x - left * 1142
+            const offset = x - left * 600
             left = m(left)
             right = m(right)
-            let leftPosition = left * 1142 + offset;// leftPosition 是把 x 分解成 left 和 offset 两部分
-            let rightPosition = (right - 1) * 1142 + offset;
+            let leftPosition = left * 600 + offset;// leftPosition 是把 x 分解成 left 和 offset 两部分
+            let rightPosition = (right - 1) * 600 + offset;
             element.children[left].style.transform = `translateX(${-leftPosition}px)`
             element.children[left].style.zIndex = 2
+            element.children[left].style.transition = 'none'
             element.children[right].style.transform = `translateX(${-rightPosition}px)`
             element.children[right].style.zIndex = 2
-
-
+            element.children[right].style.transition = 'none'
 
         }
         function mouseup(e) {
-            // console.log(e)
-            endX = endX + e.clientX - startX
+            let x = -(endX + e.clientX - startX);
+            let left = Math.floor(x / 600);
+            let right = left + 1;
+            const offset = x >= 0 ? Math.round(x % 600 / 600) : 1 + Math.round(x % 600 / 600)
+            // x 为正数、一点点：0
+            //      很多：1
+            // x 为负数、一点点：1
+            //      很多：0
+            left = m(left)
+            right = m(right)
+            let leftPosition = left * 600 + offset * 600;// leftPosition 是把 x 分解成 left 和 offset 两部分
+            let rightPosition = (right - 1) * 600 + offset * 600;
+            element.children[left].style.transform = `translateX(${-leftPosition}px)`
+            element.children[left].style.transition = ''
+            element.children[right].style.transform = `translateX(${-rightPosition}px)`
+            element.children[right].style.transition = ''
 
-            // const index = Math.round(endX / 1142)
-            // const offset = index * 1142;
+            upMovingEls[0] = element.children[left]
+            upMovingEls[1] = element.children[right]
 
-            // let left = Math.ceil(endX/1142);
-            // let right = Math.floor(endX/1142);
-            // left = m(left)
-            // right = m(right);// 得到两张图
-
-            // [...element.children].forEach(ele => {
-            //     ele.style.transform = `translateX(${offset}px)`;
-            //     ele.style.transition = ''
-            // })
-            // endX = offset
             document.removeEventListener('mousemove', mousemove)
             document.removeEventListener('mouseup', mouseup)
         }
@@ -83,6 +116,7 @@ class Carousel extends Component {
 
 
 
+        
 
 
         intervalHandler = setInterval(() => {
@@ -97,9 +131,9 @@ class Carousel extends Component {
             })
             currentEle.style.zIndex = 2
             nextEle.style.zIndex = 2
-            
-            currentEle.style.transform = `translateX(${current * -1142}px)`
-            nextEle.style.transform = `translateX(${(next - 1) * -1142}px)`
+
+            currentEle.style.transform = `translateX(${current * -600}px)`
+            nextEle.style.transform = `translateX(${(next - 1) * -600}px)`
             currentEle.style.transition = 'none'
             nextEle.style.transition = 'none'
 
@@ -108,19 +142,19 @@ class Carousel extends Component {
                 movingEls[0] = currentEle
                 movingEls[1] = nextEle
 
-                currentEle.style.transform = `translateX(${(current + 1) * -1142}px)`
-                nextEle.style.transform = `translateX(${next * -1142}px)`
+                currentEle.style.transform = `translateX(${(current + 1) * -600}px)`
+                nextEle.style.transform = `translateX(${next * -600}px)`
                 currentEle.style.transition = ''
                 nextEle.style.transition = ''
 
                 current = next
             }, 16)
-        }, 6000);
+        }, 3000);
 
 
         return element
     }
-} 
+}
 
 
 let jsx = <div>
